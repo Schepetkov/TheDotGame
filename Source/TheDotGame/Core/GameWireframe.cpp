@@ -64,7 +64,11 @@ void UGameWireframe::OnMouseButtonPressed(EDotColor InDotColor)
 				else
 				{
 					SwitchGameState(EGameState::GameOver);
-					UGameplayStatics::PlaySound2D(this, GameOverLoseSound);
+					
+					if (GameOverLoseSound)
+					{
+						UGameplayStatics::PlaySound2D(this, GameOverLoseSound);
+					}
 				}
 			}
 		}
@@ -176,11 +180,17 @@ void UGameWireframe::AddScore(EDotColor InDotColor)
 		
 		if (InDotColor == EDotColor::Red)
 		{
-			UGameplayStatics::PlaySound2D(this, RedDotPickupSound);
+			if (RedDotPickupSound)
+			{
+				UGameplayStatics::PlaySound2D(this, RedDotPickupSound);
+			}
 		}
 		else
 		{
-			UGameplayStatics::PlaySound2D(this, GreenDotPickupSound);
+			if (GreenDotPickupSound)
+			{
+				UGameplayStatics::PlaySound2D(this, GreenDotPickupSound);
+			}
 		}
 		
 		ScoreCounter++;
@@ -188,7 +198,11 @@ void UGameWireframe::AddScore(EDotColor InDotColor)
 		if (ScoreCounter == 10)
 		{
 			SwitchGameState(EGameState::GameOver);
-			UGameplayStatics::PlaySound2D(this, GameOverWinSound);
+			
+			if (GameOverWinSound)
+			{
+				UGameplayStatics::PlaySound2D(this, GameOverWinSound);
+			}
 		}
 	}
 }
