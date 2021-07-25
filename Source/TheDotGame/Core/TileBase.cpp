@@ -1,9 +1,9 @@
-#include "TileBase.h"
-
 #include <Components/Image.h>
 #include <Components/Button.h>
 #include <Components/WidgetSwitcher.h>
 #include <Components/Border.h>
+
+#include "TileBase.h"
 #include "GameWireframe.h"
 
 UImage* UTileBase::GetTileBackground_Implementation()
