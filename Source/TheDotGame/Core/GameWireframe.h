@@ -49,20 +49,8 @@ protected:
 	void ShowRandomDot();
 
 	UFUNCTION(BlueprintNativeEvent)
-	UWidgetSwitcher* GetGameStateWidgetSwitcher();
-	virtual UWidgetSwitcher* GetGameStateWidgetSwitcher_Implementation();
-	
-	UFUNCTION(BlueprintNativeEvent)
-	UHorizontalBox* GetScoreRow();
-	virtual UHorizontalBox* GetScoreRow_Implementation();
-	
-	UFUNCTION(BlueprintNativeEvent)
 	TArray<UHorizontalBox*> GetAllRows();
 	virtual TArray<UHorizontalBox*> GetAllRows_Implementation();
-
-	UFUNCTION(BlueprintNativeEvent)
-	UButton* GetStartGameButton();
-	virtual UButton* GetStartGameButton_Implementation();
 
 protected:
 	UPROPERTY(BlueprintReadOnly)

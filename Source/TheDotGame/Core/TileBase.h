@@ -43,29 +43,11 @@ protected:
 	UFUNCTION()
 	void OnClickedTileButton();
 	
-	UFUNCTION(BlueprintNativeEvent)
-	UImage* GetTileBackground();
-	virtual UImage* GetTileBackground_Implementation();
-
-	UFUNCTION(BlueprintNativeEvent)
-	UButton* GetTileButton();
-	virtual UButton* GetTileButton_Implementation();
-
-	UFUNCTION(BlueprintNativeEvent)
-	UBorder* GetTileBorder();
-	virtual UBorder* GetTileBorder_Implementation();
-
-	UFUNCTION(BlueprintNativeEvent)
-	UWidgetSwitcher* GetDotSwitcher();
-	virtual UWidgetSwitcher* GetDotSwitcher_Implementation();
-
 private:
 	UGameWireframe* GameWireframe = nullptr;
-	UButton* TileButton = nullptr;
 	UBorder* TileBorder = nullptr;
 	UWidgetSwitcher* DotSwitcher = nullptr;
 
 	EDotColor CurrentDot = EDotColor::None;
-
 	bool bScoreTile = false;
 };

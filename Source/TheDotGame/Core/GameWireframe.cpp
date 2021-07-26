@@ -1,13 +1,13 @@
-#include "GameWireframe.h"
-
 #include <Blueprint/UserWidget.h>
 #include <Blueprint/WidgetTree.h>
 #include <Components/HorizontalBox.h>
 #include <Components/WidgetSwitcher.h>
 #include <Kismet/KismetMathLibrary.h>
 #include <Components/Button.h>
-#include "TheDotGamePlayerController.h"
 #include <Kismet/GameplayStatics.h>
+
+#include "GameWireframe.h"
+#include "TheDotGamePlayerController.h"
 
 void UGameWireframe::ShowRandomDot()
 {
@@ -31,14 +31,18 @@ void UGameWireframe::NativePreConstruct()
 {
 	Super::NativePreConstruct();
 
-	CreateGrid();
-
-	UButton* StartGameButton = GetStartGameButton();
-
-	if (StartGameButton)
+	if (WidgetTree)
 	{
-		StartGameButton->OnClicked.AddDynamic(this, &UGameWireframe::OnClickedStartGameButton);
+		if (UButton* StartGameButton = Cast<UButton>(WidgetTree->FindWidget("StartGameButton")))
+		{
+			if (StartGameButton)
+			{
+				StartGameButton->OnClicked.AddDynamic(this, &UGameWireframe::OnClickedStartGameButton);
+			}
+		}
 	}
+	
+	CreateGrid();
 }
 
 void UGameWireframe::OnMouseButtonPressed(EDotColor InDotColor)
@@ -77,30 +81,35 @@ void UGameWireframe::OnMouseButtonPressed(EDotColor InDotColor)
 
 void UGameWireframe::SwitchGameState(EGameState InGameState)
 {
-	UWidgetSwitcher* GameStateWidgetSwitcher = GetGameStateWidgetSwitcher();
-	if (GameStateWidgetSwitcher)
+	if (WidgetTree)
 	{
-		switch (InGameState)
+		if (UWidgetSwitcher* GameStateWidgetSwitcher = Cast<UWidgetSwitcher>(WidgetTree->FindWidget("GameStateWidgetSwitcher")))
 		{
-		case EGameState::Intro:
-			GameStateWidgetSwitcher->SetActiveWidgetIndex(0);
-			break;
-		case EGameState::Game:
-			GameStateWidgetSwitcher->SetActiveWidgetIndex(1);
-			
-			GetWorld()->GetTimerManager().ClearTimer(RestartGameTimerHandle);
-			GetWorld()->GetTimerManager().SetTimer(DotSpawnTimerHandle, this, &UGameWireframe::ShowRandomDot, 2.f, true);
-			
-			break;
-		case EGameState::GameOver:
-			GameStateWidgetSwitcher->SetActiveWidgetIndex(2);
-			
-			GetWorld()->GetTimerManager().ClearTimer(DotSpawnTimerHandle);
-			GetWorld()->GetTimerManager().SetTimer(RestartGameTimerHandle, this, &UGameWireframe::PrepareToRestartGame, 1.f, true);
-			
-			break;
-		default:
-			break;
+			if (GameStateWidgetSwitcher)
+			{
+				switch (InGameState)
+				{
+				case EGameState::Intro:
+					GameStateWidgetSwitcher->SetActiveWidgetIndex(0);
+					break;
+				case EGameState::Game:
+					GameStateWidgetSwitcher->SetActiveWidgetIndex(1);
+
+					GetWorld()->GetTimerManager().ClearTimer(RestartGameTimerHandle);
+					GetWorld()->GetTimerManager().SetTimer(DotSpawnTimerHandle, this, &UGameWireframe::ShowRandomDot, 2.f, true);
+
+					break;
+				case EGameState::GameOver:
+					GameStateWidgetSwitcher->SetActiveWidgetIndex(2);
+
+					GetWorld()->GetTimerManager().ClearTimer(DotSpawnTimerHandle);
+					GetWorld()->GetTimerManager().SetTimer(RestartGameTimerHandle, this, &UGameWireframe::PrepareToRestartGame, 1.f, true);
+
+					break;
+				default:
+					break;
+				}
+			}
 		}
 	}
 }
@@ -110,26 +119,11 @@ void UGameWireframe::SetHoveredTile(UTileBase* InHoveredTile)
 	HoveredTile = InHoveredTile;
 }
 
-UWidgetSwitcher* UGameWireframe::GetGameStateWidgetSwitcher_Implementation()
-{
-	return nullptr;
-}
-
-UHorizontalBox* UGameWireframe::GetScoreRow_Implementation()
-{
-	return nullptr;
-}
-
 TArray<UHorizontalBox*> UGameWireframe::GetAllRows_Implementation()
 {
 	TArray<UHorizontalBox*> GridRows;
 	
 	return GridRows;
-}
-
-UButton* UGameWireframe::GetStartGameButton_Implementation()
-{
-	return nullptr;
 }
 
 void UGameWireframe::CreateGrid()
@@ -157,16 +151,21 @@ void UGameWireframe::CreateGrid()
 		RowCounter++;
 	}
 	
-	UHorizontalBox* ScoreRow = GetScoreRow();
-	if (ScoreRow)
+	if (WidgetTree)
 	{
-		for (int32 i = 0; i < 10; i++)
+		if (UHorizontalBox* ScoreRow = Cast<UHorizontalBox>(WidgetTree->FindWidget("ScoreHorizontalBoxRow")))
 		{
-			if (UTileBase* ScoreTile = Cast<UTileBase>(CreateWidget<UTileBase>(this, TileBaseClass)))
+			if (ScoreRow)
 			{
-				ScoreRow->AddChild(ScoreTile);
-				ScoreTile->MakeTileScore();
-				AllScoreTiles.Add(ScoreTile);
+				for (int32 i = 0; i < 10; i++)
+				{
+					if (UTileBase* ScoreTile = Cast<UTileBase>(CreateWidget<UTileBase>(this, TileBaseClass)))
+					{
+						ScoreRow->AddChild(ScoreTile);
+						ScoreTile->MakeTileScore();
+						AllScoreTiles.Add(ScoreTile);
+					}
+				}
 			}
 		}
 	}

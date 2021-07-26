@@ -2,29 +2,10 @@
 #include <Components/Button.h>
 #include <Components/WidgetSwitcher.h>
 #include <Components/Border.h>
+#include <Blueprint/WidgetTree.h>
 
 #include "TileBase.h"
 #include "GameWireframe.h"
-
-UImage* UTileBase::GetTileBackground_Implementation()
-{
-	return nullptr;
-}
-
-UButton* UTileBase::GetTileButton_Implementation()
-{
-	return nullptr;
-}
-
-UBorder* UTileBase::GetTileBorder_Implementation()
-{
-	return nullptr;
-}
-
-UWidgetSwitcher* UTileBase::GetDotSwitcher_Implementation()
-{
-	return nullptr;
-}
 
 void UTileBase::SetWidgetOwner(UGameWireframe* InGameWireframe)
 {
@@ -39,9 +20,8 @@ void UTileBase::SetDot(EDotColor InDot)
 void UTileBase::MakeTileScore()
 {
 	bScoreTile = true;
-	
-	UImage* TileBackground = GetTileBackground();
-	if (TileBackground)
+
+	if (UImage* TileBackground = Cast<UImage>(WidgetTree->FindWidget("TileBackground")))
 	{
 		TileBackground->SetVisibility(ESlateVisibility::Hidden);
 	}
@@ -56,17 +36,21 @@ void UTileBase::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	DotSwitcher = GetDotSwitcher();
-	TileButton = GetTileButton();
-	TileBorder = GetTileBorder();
-
-	if (TileButton && TileBorder)
+	if (WidgetTree)
 	{
-		TileButton->OnHovered.AddDynamic(this, &UTileBase::OnHoveredTileButton);
-		TileButton->OnUnhovered.AddDynamic(this, &UTileBase::OnUnhoveredTileButton);
-		TileButton->OnClicked.AddDynamic(this, &UTileBase::OnClickedTileButton);
-	}
+		TileBorder = Cast<UBorder>(WidgetTree->FindWidget("TileBorder"));
+		DotSwitcher = Cast<UWidgetSwitcher>(WidgetTree->FindWidget("DotWidgetSwitcher"));
 
+		if (UButton* TileButton = Cast<UButton>(WidgetTree->FindWidget("TileButton")))
+		{
+			if (TileButton)
+			{
+				TileButton->OnHovered.AddDynamic(this, &UTileBase::OnHoveredTileButton);
+				TileButton->OnUnhovered.AddDynamic(this, &UTileBase::OnUnhoveredTileButton);
+				TileButton->OnClicked.AddDynamic(this, &UTileBase::OnClickedTileButton);
+			}
+		}
+	}
 }
 
 void UTileBase::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
